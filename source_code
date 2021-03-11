@@ -1,0 +1,136 @@
+import pandas as pd
+from sklearn import linear_model
+import tkinter as tk 
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import numpy as np
+# Creating the Canvas
+root= tk.Tk()
+  
+canvas1 = tk.Canvas(root, width = 800, height = 700)
+canvas1.pack()
+# First Label
+label1 = tk.Label(root, text='A Multiple Linear Regression Model for Customer Satisfaction Evaluation')
+label1.config(font=('Arial', 18))
+canvas1.create_window(400, 50, window=label1)
+
+# Reading the Dataset
+df = pd.read_csv("C:/Users/user/Desktop/chuksScaledData.csv")
+# The Regression Model
+msk = np.random.rand(len(df)) < 0.8
+train = df[msk]
+test = df[~msk]
+
+regr = linear_model.LinearRegression()
+train_x = np.asanyarray(train[["web_design_quality", "post_order_support", "quality_of_product","online_stores_facility","hedonic_factors","online_store_image"]])
+train_y = np.asanyarray(train[['customer_satisfaction']])
+regr.fit (train_x, train_y)
+# Printing the Parameters
+print("Coefficient: ", regr.coef_)
+print("Intercept: ", regr.intercept_)
+
+# Printing Intercept and Coefficient on GUI
+Intercept_result = ('Intercept: ', regr.intercept_)
+label_Intercept = tk.Label(root, text=Intercept_result, justify = 'center')
+canvas1.create_window(400, 110, window=label_Intercept)
+Coefficients_result  = ('Coefficients: ', regr.coef_)
+label_Coefficients = tk.Label(root, text=Coefficients_result, justify = 'center')
+canvas1.create_window(400, 135, window=label_Coefficients)
+
+# Receiving User Inputs for Prediction
+label4 = tk.Label(root, text='RECEIVING USER INPUTS FOR PREDICTION')
+label4.config(font=('Arial', 16))
+canvas1.create_window(400, 180, window=label4)
+
+# web_design_quality label and input box
+label5 = tk.Label(root, text='Enter Value for web_design_quality')
+canvas1.create_window(400, 200, window=label5)
+
+entry1 = tk.Entry (root) # create 1st entry box
+canvas1.create_window(560, 200, window=entry1)
+
+# post_order_support label and input box
+label6 = tk.Label(root, text='Enter Value for post_order_support')
+canvas1.create_window(400, 220, window=label6)
+
+entry2 = tk.Entry (root) # create 2nd entry box
+canvas1.create_window(560, 220, window=entry2)
+
+# quality_of_product label and input box
+label7 = tk.Label(root, text='Enter Value for quality_of_product')
+canvas1.create_window(400, 240, window=label7)
+
+entry3 = tk.Entry (root) # create 3rd entry box
+canvas1.create_window(560, 240, window=entry3)
+
+
+# online_stores_facility label and input box
+label8 = tk.Label(root, text='Enter Value for online_stores_facility')
+canvas1.create_window(400, 260, window=label8)
+
+entry4 = tk.Entry (root) # create 4th entry box
+canvas1.create_window(560, 260, window=entry4)
+
+# hedonic_factors label and input box
+label9 = tk.Label(root, text='Enter Value for hedonic_factors')
+canvas1.create_window(400, 280, window=label9)
+
+entry5 = tk.Entry (root) # create 5th entry box
+canvas1.create_window(560, 280, window=entry5)
+
+# online_store_image label and input box
+label10 = tk.Label(root, text='Enter Value for online_store_image')
+canvas1.create_window(400, 300, window=label10)
+
+entry6 = tk.Entry (root) # create 6th entry box
+canvas1.create_window(560, 300, window=entry6)
+
+def values(): 
+    global New_web_design_quality #our 1st input variable
+    New_web_design_quality = float(entry1.get()) 
+    
+    global New_post_order_support #our 2nd input variable
+    New_post_order_support = float(entry2.get())
+
+    global New_quality_of_product #our 3rd input variable
+    New_quality_of_product = float(entry3.get())
+
+    global New_online_stores_facility #our 4th input variable
+    New_online_stores_facility = float(entry4.get())
+
+    global New_hedonic_factors #our 5th input variable
+    New_hedonic_factors = float(entry5.get()) 
+
+    global New_online_store_image #our 6th input variable
+    New_online_store_image = float(entry6.get())    
+    
+    Prediction_result  = ('Predicted Customer Satisfaction Level: ', regr.predict([[New_web_design_quality,New_post_order_support,New_quality_of_product,New_online_stores_facility,New_hedonic_factors,New_online_store_image]]))
+    label_Prediction = tk.Label(root, text= Prediction_result, bg='orange')
+    canvas1.create_window(400, 360, window=label_Prediction)
+    
+button1 = tk.Button (root, text='Predict Customer Satisfaction Level',command=values, bg='orange') # button to call the 'values' command above 
+canvas1.create_window(400, 340, window=button1)
+ 
+#Evaluation Metrics
+label11 = tk.Label(root, text='MODEL EVALUATION USING RMSE, MAE AND R2-SCORE')
+label11.config(font=('Arial', 16))
+canvas1.create_window(400, 400, window=label11)
+
+from sklearn.metrics import r2_score
+test_x = np.asanyarray(test[["web_design_quality", "post_order_support", "quality_of_product","online_stores_facility","hedonic_factors","online_store_image"]])
+test_y = np.asanyarray(test[['customer_satisfaction']])
+test_y_ = regr.predict(test_x)
+
+Mean_absolute_error  = ('Mean Absolute Error: ',np.mean(np.absolute(test_y_ - test_y)))
+label12 = tk.Label(root, text= Mean_absolute_error, bg='magenta')
+canvas1.create_window(400, 420, window=label12)
+
+Residual_sum_square  = ('Residual sum of squares (MSE): ',np.mean((test_y_ - test_y) ** 2))
+label13 = tk.Label(root, text= Residual_sum_square, bg='magenta')
+canvas1.create_window(400, 440, window=label13)
+
+R2_score  = ('R2-score: ',r2_score(test_y_ , test_y))
+label14 = tk.Label(root, text= R2_score, bg='magenta')
+canvas1.create_window(400, 460, window=label14)
+
+root.mainloop()
